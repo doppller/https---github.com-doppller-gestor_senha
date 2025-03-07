@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerar Senha Segura</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            display: grid;
+            gap: 15px;
+            text-align: center;
+        }
+        input, button {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Gerar Senha Segura</h2>
+
+        <input type="number" id="tamanho" value="12" min="8" max="32">
+        <button onclick="gerarSenha()">🔒 Gerar Senha</button>
+        <p id="senhaGerada">Clique no botão acima para gerar uma senha.</p>
+        <button onclick="copiarSenha()">📋 Copiar Senha</button>
+
+        <a href="{{ url_for('dashboard') }}">⬅ Voltar para o Dashboard</a>
+    </div>
+</body>
+</html>
