@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .mensagem {
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            width: 300px;
+            margin: 10px auto;
+        }
+        .mensagem.error {
+            color: white;
+            background-color: red;
+        }
+        .mensagem.success {
+            color: white;
+            background-color: green;
+        }
+        input, button {
+            display: block;
+            margin: 10px auto;
+            padding: 8px;
+            width: 250px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Login</h2>
+
+    <!-- Exibir mensagens de erro -->
+    {% with mensagens = get_flashed_messages(with_categories=True) %}
+        {% if mensagens %}
+            {% for categoria, mensagem in mensagens %}
+                <p class="mensagem {{ categoria }}">{{ mensagem }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Formulário de Login -->
+    <form action="{{ url_for('login') }}" method="POST">
+        <input type="text" name="usuario" placeholder="Usuário" required>
+        <input type="password" name="senha" placeholder="Senha" required>
+        <button type="submit">Entrar</button>
+    </form>
+
+    <a href="{{ url_for('cadastro') }}">Criar uma conta</a>
+
+</body>
+</html>
