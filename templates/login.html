@@ -7,53 +7,62 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            display: grid;
+            gap: 15px;
             text-align: center;
-            margin-top: 50px;
-        }
-        .mensagem {
-            padding: 10px;
-            border-radius: 5px;
-            font-weight: bold;
-            width: 300px;
-            margin: 10px auto;
-        }
-        .mensagem.error {
-            color: white;
-            background-color: red;
-        }
-        .mensagem.success {
-            color: white;
-            background-color: green;
         }
         input, button {
-            display: block;
-            margin: 10px auto;
-            padding: 8px;
-            width: 250px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h2>Login</h2>
 
-    <h2>Login</h2>
+        {% with mensagens = get_flashed_messages(with_categories=True) %}
+            {% if mensagens %}
+                {% for categoria, mensagem in mensagens %}
+                    <p class="error">{{ mensagem }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    <!-- Exibir mensagens de erro -->
-    {% with mensagens = get_flashed_messages(with_categories=True) %}
-        {% if mensagens %}
-            {% for categoria, mensagem in mensagens %}
-                <p class="mensagem {{ categoria }}">{{ mensagem }}</p>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+        <form action="{{ url_for('login') }}" method="POST" style="display: grid; gap: 10px;">
+            <input type="text" name="usuario" placeholder="Usuário" required>
+            <input type="password" name="senha" placeholder="Senha" required>
+            <button type="submit">Entrar</button>
+        </form>
 
-    <!-- Formulário de Login -->
-    <form action="{{ url_for('login') }}" method="POST">
-        <input type="text" name="usuario" placeholder="Usuário" required>
-        <input type="password" name="senha" placeholder="Senha" required>
-        <button type="submit">Entrar</button>
-    </form>
-
-    <a href="{{ url_for('cadastro') }}">Criar uma conta</a>
-
+        <a href="{{ url_for('cadastro') }}">Criar Conta</a>
+    </div>
 </body>
 </html>
