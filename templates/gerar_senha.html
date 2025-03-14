@@ -1,5 +1,103 @@
-<form>
-    <h2>Gerar Senha Segura</h2>
-    <input type="number" name="tamanho" placeholder="Tamanho da senha (8-32)">
-    <button type="submit">Gerar</button>
-</form>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerar Senha Segura</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            display: grid;
+            gap: 15px;
+            text-align: center;
+        }
+        input, button {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        #senhaGerada {
+            font-size: 18px;
+            font-weight: bold;
+            background: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Gerar Senha Segura</h2>
+
+        <!-- Seleção do tamanho da senha -->
+        <label for="tamanho">Escolha o tamanho da senha:</label>
+        <input type="number" id="tamanho" value="12" min="8" max="32">
+
+        <button id="btnGerar">🔒 Gerar Senha</button>
+
+        <!-- Campo para exibir a senha gerada -->
+        <p id="senhaGerada">Clique no botão acima para gerar uma senha.</p>
+
+        <!-- Botão para copiar a senha -->
+        <button id="btnCopiar">📋 Copiar Senha</button>
+
+        <a href="{{ url_for('dashboard') }}">
+            <button class="back">⬅ Voltar para o Dashboard</button>
+        </a>
+    </div>
+
+    <script>
+        document.getElementById("btnGerar").addEventListener("click", function() {
+            let tamanho = document.getElementById("tamanho").value;
+            let caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+            let senha = "";
+
+            for (let i = 0; i < tamanho; i++) {
+                senha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            }
+
+            document.getElementById("senhaGerada").innerText = senha;
+        });
+
+        document.getElementById("btnCopiar").addEventListener("click", function() {
+            let senha = document.getElementById("senhaGerada").innerText;
+
+            if (senha === "Clique no botão acima para gerar uma senha.") {
+                alert("Por favor, gere uma senha antes de copiá-la!");
+                return;
+            }
+
+            navigator.clipboard.writeText(senha).then(() => {
+                alert("Senha copiada para a área de transferência!");
+            }).catch(err => {
+                alert("Erro ao copiar senha: " + err);
+            });
+        });
+    </script>
+
+</body>
+</html>
