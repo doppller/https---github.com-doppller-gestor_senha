@@ -32,16 +32,39 @@ input, button {
 }
 
 button, .botao {
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-    text-align: center;
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 8px 4px;
+    font-size: 14px;
+    background-color: #ffffff;
+    color: #040404;
+    border: 1px solid #ccc;
+    border-radius: 6px;
     text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 button:hover, .botao:hover {
-    opacity: 0.85;
+    background-color: #ad2424;
+    color: #000;
+    border-color: #aaa;
 }
+.copiar {
+    background-color: #e0e0e0;
+    border: none;
+    padding: 5px 8px;
+    margin-left: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.copiar:hover {
+    background-color: #d0d0d0;
+}
+
 
 .erro {
     color: red;

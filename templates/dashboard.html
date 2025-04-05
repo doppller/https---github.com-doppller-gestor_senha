@@ -34,7 +34,10 @@
                         <tr>
                             <td>{{ plataforma }}</td>
                             <td>{{ dados[0] }}</td>
-                            <td>{{ dados[1] }}</td>
+                            <td>
+                                <span id="senha-{{ loop.index }}">{{ dados[1] }}</span>
+                                <button class="copiar" onclick="copiarSenha('senha-{{ loop.index }}')">📋</button>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -43,5 +46,16 @@
             <p>Nenhuma senha salva ainda.</p>
         {% endif %}
     </div>
+
+    <script>
+        function copiarSenha(id) {
+            const texto = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(texto).then(() => {
+                alert("Senha copiada com sucesso!");
+            }).catch(err => {
+                alert("Erro ao copiar senha.");
+            });
+        }
+    </script>
 </body>
 </html>
