@@ -2,56 +2,25 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Gestor de Senhas</title>
+    <title>Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
-    <style>
-        .alerta {
-            color: red;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-    </style>
 </head>
 <body>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
     <div class="container">
         <h1>🔐 Login</h1>
-        <button id="toggle-dark-mode" class="modo-btn">🌓 Modo Escuro</button>
-
-
-        <!-- Formulário com ID para usar no JS -->
-        <form id="formLogin" method="POST">
-            <input type="text" name="usuario" id="usuario" placeholder="Usuário" required>
-            <input type="password" name="senha" id="senha" placeholder="Senha" required>
-            <button type="submit" id="botaoLogin">Entrar</button>
-            <div id="mensagemErro" class="alerta"></div>
+        <form method="POST">
+            <input type="text" name="usuario" placeholder="Usuário" required>
+            <input type="password" name="senha" placeholder="Senha" required>
+            <button type="submit">Entrar</button>
         </form>
-
-        <p>Não tem uma conta? <a href="{{ url_for('cadastro') }}">Cadastre-se aqui</a></p>
-
-        {% with mensagens = get_flashed_messages(with_categories=true) %}
-            {% if mensagens %}
-                {% for categoria, mensagem in mensagens %}
-                    <p class="alerta">{{ mensagem }}</p>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+        <a class="botao" href="{{ url_for('cadastro') }}">Criar conta</a>
     </div>
 
     <script>
-        const form = document.getElementById("formLogin");
-        const usuario = document.getElementById("usuario");
-        const senha = document.getElementById("senha");
-        const mensagemErro = document.getElementById("mensagemErro");
-
-        form.addEventListener("submit", function(e) {
-            mensagemErro.textContent = "";
-
-            if (usuario.value.trim() === "" || senha.value.trim() === "") {
-                e.preventDefault();  // impede o envio do formulário
-                mensagemErro.textContent = "Por favor, preencha todos os campos.";
-            }
-        });
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark");
+        }
     </script>
 </body>
 </html>

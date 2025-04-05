@@ -2,101 +2,54 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Gerar Senha</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            width: 350px;
-            text-align: center;
-        }
-
-        h2 {
-            margin-bottom: 20px;
-        }
-
-        input[type="number"] {
-            width: 60px;
-            padding: 5px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-
-        button {
-            padding: 10px 20px;
-            margin: 5px;
-            background-color: #007bff;
-            border: none;
-            color: white;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            opacity: 0.9;
-        }
-
-        #senhaGerada {
-            margin-top: 15px;
-            font-weight: bold;
-            color: green;
-        }
-
-        a {
-            display: inline-block;
-            margin-top: 20px;
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerar Senha Segura</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
 </head>
 <body>
     <div class="container">
-        <h2>Gerador de Senhas</h2>
-        <label for="tamanho">Tamanho:</label>
-        <input type="number" id="tamanho" min="4" max="32" value="12"><br>
-        <button onclick="gerarSenha()">Gerar</button>
-        <button onclick="copiarSenha()">Copiar</button>
-
-        <div id="senhaGerada"></div>
-
-        <a href="{{ url_for('dashboard') }}">⬅ Voltar ao Dashboard</a>
+        <button id="toggle-dark" class="toggle-button">🌙</button>
+        <h1>🔐 Gerador de Senhas Seguras</h1>
+        <form id="formSenha">
+            <input type="text" id="senhaGerada" name="senhaGerada" placeholder="Clique para gerar uma senha" required readonly>
+            <div class="btn-group">
+                <button type="button" id="gerarBtn">Gerar Senha</button>
+                <button type="button" id="copiarBtn">Copiar</button>
+            </div>
+        </form>
+        <a class="botao" href="{{ url_for('dashboard') }}">⬅️ Voltar ao Dashboard</a>
     </div>
 
     <script>
-        function gerarSenha() {
-            const tamanho = document.getElementById("tamanho").value;
-            const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*";
-            let senha = "";
-            for (let i = 0; i < tamanho; i++) {
-                senha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
-            }
-            document.getElementById("senhaGerada").innerText = senha;
+        // Mantém tema escuro entre páginas
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
         }
 
-        function copiarSenha() {
-            const senha = document.getElementById("senhaGerada").innerText;
-            if (!senha) return;
-            navigator.clipboard.writeText(senha).then(() => {
-                alert("Senha copiada!");
-            });
-        }
+        document.getElementById('toggle-dark').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const darkModeAtivo = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', darkModeAtivo);
+        });
+
+        // Geração de senha segura
+        document.getElementById('gerarBtn').addEventListener('click', () => {
+            const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,<.>/?';
+            let senha = '';
+            for (let i = 0; i < 16; i++) {
+                senha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            }
+            document.getElementById('senhaGerada').value = senha;
+        });
+
+        // Copiar para área de transferência
+        document.getElementById('copiarBtn').addEventListener('click', () => {
+            const senhaInput = document.getElementById('senhaGerada');
+            senhaInput.select();
+            senhaInput.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            alert('Senha copiada!');
+        });
     </script>
 </body>
 </html>

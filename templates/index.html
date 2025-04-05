@@ -2,46 +2,21 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Senhas</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            width: 350px;
-            display: grid;
-            gap: 15px;
-            text-align: center;
-        }
-        a {
-            text-decoration: none;
-            background-color: #007bff;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            display: block;
-        }
-        a:hover {
-            opacity: 0.8;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
 </head>
 <body>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
     <div class="container">
-        <h1>Bem-vindo ao Gestor de Senhas</h1>
-        <a href="{{ url_for('login') }}">🔑 Fazer Login</a>
-        <a href="{{ url_for('cadastro') }}">📝 Criar Conta</a>
+        <h1>🔐 Bem-vindo ao Gestor de Senhas</h1>
+        <a class="botao" href="{{ url_for('login') }}">Fazer Login</a>
+        <a class="botao" href="{{ url_for('cadastro') }}">Criar Conta</a>
     </div>
+
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark");
+        }
+    </script>
 </body>
 </html>

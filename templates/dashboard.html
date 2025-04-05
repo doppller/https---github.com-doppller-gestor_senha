@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Gestor de Senhas</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
 </head>
 <body>
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
     <div class="container">
         <h1>📋 Suas Senhas</h1>
+
         <form method="POST">
             <input type="text" name="plataforma" placeholder="Plataforma" required>
             <input type="text" name="user" placeholder="Usuário" required>
@@ -27,6 +28,7 @@
                         <th>Plataforma</th>
                         <th>Usuário</th>
                         <th>Senha</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,10 +36,8 @@
                         <tr>
                             <td>{{ plataforma }}</td>
                             <td>{{ dados[0] }}</td>
-                            <td>
-                                <span id="senha-{{ loop.index }}">{{ dados[1] }}</span>
-                                <button class="copiar" onclick="copiarSenha('senha-{{ loop.index }}')">📋</button>
-                            </td>
+                            <td id="senha-{{ loop.index }}">{{ dados[1] }}</td>
+                            <td><button type="button" onclick="copiarSenha('senha-{{ loop.index }}')">📋 Copiar</button></td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -49,12 +49,16 @@
 
     <script>
         function copiarSenha(id) {
-            const texto = document.getElementById(id).innerText;
-            navigator.clipboard.writeText(texto).then(() => {
-                alert("Senha copiada com sucesso!");
-            }).catch(err => {
-                alert("Erro ao copiar senha.");
-            });
+            const senha = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(senha)
+                .then(() => alert("Senha copiada!"))
+                .catch(() => alert("Erro ao copiar a senha."));
+        }
+
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const atual = html.getAttribute("data-theme");
+            html.setAttribute("data-theme", atual === "dark" ? "light" : "dark");
         }
     </script>
 </body>
