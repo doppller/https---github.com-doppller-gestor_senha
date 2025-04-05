@@ -1,86 +1,292 @@
 :root {
-    --cor-primaria: #007bff;
-    --cor-texto: #333;
-    --cor-fundo: #f4f4f4;
-    --cor-container: #fff;
+    --cor-primaria: #4361ee;
+    --cor-secundaria: #3f37c9;
+    --cor-sucesso: #4cc9f0;
+    --cor-texto: #2b2d42;
+    --cor-texto-claro: #8d99ae;
+    --cor-fundo: #f8f9fa;
+    --cor-container: #ffffff;
+    --sombra: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --borda-arredondada: 12px;
 }
 
 body.dark-mode {
-    --cor-primaria: #1e90ff;
-    --cor-texto: #f1f1f1;
+    --cor-primaria: #4895ef;
+    --cor-secundaria: #4361ee;
+    --cor-texto: #f8f9fa;
+    --cor-texto-claro: #adb5bd;
     --cor-fundo: #121212;
     --cor-container: #1e1e1e;
+    --sombra: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+* {
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background-color: var(--cor-fundo);
     color: var(--cor-texto);
+    line-height: 1.6;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
     display: grid;
     place-items: center;
-    min-height: 100vh;
 }
 
 .container {
     background-color: var(--cor-container);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    display: grid;
-    gap: 20px;
-    width: 90%;
-    max-width: 500px;
-}
-
-input, button {
-    padding: 10px;
-    margin: 5px 0;
+    padding: 2.5rem;
+    border-radius: var(--borda-arredondada);
+    box-shadow: var(--sombra);
     width: 100%;
-    border: none;
-    border-radius: 6px;
-    font-size: 1em;
+    max-width: 500px;
+    margin: 1rem;
+    animation: fadeIn 0.4s ease-out;
 }
 
-button {
-    background-color: var(--cor-primaria);
-    color: white;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-a.botao {
-    background-color: var(--cor-primaria);
-    color: white;
-    text-decoration: none;
-    padding: 8px;
-    margin-top: 5px;
-    display: block;
-    border-radius: 6px;
+.logo {
     text-align: center;
-    font-size: 0.95em;
+    margin-bottom: 2rem;
 }
 
-a.botao:hover {
-    background-color: #0056b3;
+.logo svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
 }
 
-#botao-tema {
+h1 {
+    color: var(--cor-primaria);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--cor-texto-claro);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: var(--cor-container);
+    color: var(--cor-texto);
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+}
+
+.btn {
+    display: inline-block;
+    background-color: var(--cor-primaria);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    width: 100%;
+}
+
+.btn:hover {
+    background-color: var(--cor-secundaria);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--cor-primaria);
+    border: 1px solid var(--cor-primaria);
+}
+
+.btn-icon {
+    width: auto;
+    padding: 0.5rem;
+    border-radius: 50%;
+    font-size: 1rem;
+}
+
+.form-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--cor-texto-claro);
+}
+
+.form-link a {
+    color: var(--cor-primaria);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.dark-mode-toggle {
     position: fixed;
     top: 20px;
     right: 20px;
-    background-color: var(--cor-primaria);
+    background: var(--cor-primaria);
     color: white;
     border: none;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 18px;
+    display: grid;
+    place-items: center;
     cursor: pointer;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    font-size: 1.2rem;
+    z-index: 100;
+}
+
+.password-grid {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.password-card {
+    background: var(--cor-container);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: var(--sombra);
+    border-left: 4px solid var(--cor-primaria);
+    transition: all 0.3s ease;
+}
+
+.password-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.password-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.password-platform {
+    font-weight: 600;
+    color: var(--cor-primaria);
+}
+
+.password-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.password-user {
+    color: var(--cor-texto-claro);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.password-value {
+    font-family: 'Courier New', monospace;
+    background: rgba(0,0,0,0.05);
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    word-break: break-all;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    justify-content: center;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 2rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--cor-texto-claro);
+}
+
+th {
+    color: var(--cor-primaria);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--cor-texto-claro);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 1.5rem;
+        margin: 0.5rem;
+        border-radius: 0;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .password-actions {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+}
+
+.password-strength {
+    margin-top: 0.5rem;
+}
+
+.strength-bar {
+    height: 4px;
+    background: #e9ecef;
+    border-radius: 2px;
+    margin-bottom: 0.25rem;
+    transition: all 0.3s ease;
+}
+
+.strength-text {
+    font-size: 0.8rem;
+    color: var(--cor-texto-claro);
+}
+
+.strength-text span {
+    font-weight: 600;
+}
+
+/* Mostrar/Ocultar Senha */
+.password-wrapper {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--cor-texto-claro);
+    cursor: pointer;
 }

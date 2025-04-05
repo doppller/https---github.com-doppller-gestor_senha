@@ -2,20 +2,34 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Senhas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
 </head>
 <body>
     <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+    
     <div class="container">
-        <h1>🔐 Bem-vindo ao Gestor de Senhas</h1>
-        <a class="botao" href="{{ url_for('login') }}">Fazer Login</a>
-        <a class="botao" href="{{ url_for('cadastro') }}">Criar Conta</a>
+        <div class="logo">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 15V17M6 21H18C19.1046 21 20 20.1046 20 19V13C20 11.8954 19.1046 11 18 11H6C4.89543 11 4 11.8954 4 13V19C4 20.1046 4.89543 21 6 21ZM16 11V7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7V11H16Z" 
+                      stroke="var(--cor-primaria)" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <h1>Bem-vindo ao Gestor de Senhas</h1>
+        </div>
+
+        <a href="{{ url_for('login') }}" class="btn">Fazer Login</a>
+        <a href="{{ url_for('cadastro') }}" class="btn btn-secondary">Criar Conta</a>
     </div>
 
     <script>
         function toggleDarkMode() {
-            document.body.classList.toggle("dark");
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
         }
     </script>
 </body>

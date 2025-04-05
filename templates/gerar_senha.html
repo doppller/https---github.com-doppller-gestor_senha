@@ -4,35 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerar Senha Segura</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
 </head>
 <body>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+    
     <div class="container">
-        <button id="toggle-dark" class="toggle-button">🌙</button>
-        <h1>🔐 Gerador de Senhas Seguras</h1>
+        <div class="logo">
+            <h1>🔐 Gerador de Senhas Seguras</h1>
+        </div>
+
         <form id="formSenha">
-            <input type="text" id="senhaGerada" name="senhaGerada" placeholder="Clique para gerar uma senha" required readonly>
-            <div class="btn-group">
-                <button type="button" id="gerarBtn">Gerar Senha</button>
-                <button type="button" id="copiarBtn">Copiar</button>
+            <div class="form-group">
+                <input type="text" id="senhaGerada" name="senhaGerada" 
+                       placeholder="Clique em gerar para criar uma senha segura" readonly>
+            </div>
+            
+            <div class="action-buttons">
+                <button type="button" id="gerarBtn" class="btn">Gerar Senha</button>
+                <button type="button" id="copiarBtn" class="btn btn-secondary">Copiar</button>
             </div>
         </form>
-        <a class="botao" href="{{ url_for('dashboard') }}">⬅️ Voltar ao Dashboard</a>
+
+        <div class="form-link">
+            <a href="{{ url_for('dashboard') }}">← Voltar ao Dashboard</a>
+        </div>
     </div>
 
     <script>
-        // Mantém tema escuro entre páginas
+        // Configuração do tema
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark-mode');
         }
 
-        document.getElementById('toggle-dark').addEventListener('click', () => {
+        function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
-            const darkModeAtivo = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', darkModeAtivo);
-        });
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
 
-        // Geração de senha segura
+        // Geração de senha
         document.getElementById('gerarBtn').addEventListener('click', () => {
             const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,<.>/?';
             let senha = '';
@@ -42,13 +52,16 @@
             document.getElementById('senhaGerada').value = senha;
         });
 
-        // Copiar para área de transferência
+        // Copiar senha
         document.getElementById('copiarBtn').addEventListener('click', () => {
             const senhaInput = document.getElementById('senhaGerada');
-            senhaInput.select();
-            senhaInput.setSelectionRange(0, 99999);
-            document.execCommand('copy');
-            alert('Senha copiada!');
+            if (senhaInput.value) {
+                senhaInput.select();
+                document.execCommand('copy');
+                alert('Senha copiada para a área de transferência!');
+            } else {
+                alert('Gere uma senha primeiro!');
+            }
         });
     </script>
 </body>

@@ -1,64 +1,88 @@
 <!DOCTYPE html>
-<html lang="pt" data-theme="light">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Gestor de Senhas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
 </head>
 <body>
-    <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+    
     <div class="container">
-        <h1>📋 Suas Senhas</h1>
-
-        <form method="POST">
-            <input type="text" name="plataforma" placeholder="Plataforma" required>
-            <input type="text" name="user" placeholder="Usuário" required>
-            <input type="password" name="senha" placeholder="Senha" required>
-            <button type="submit">Salvar Senha</button>
+        <div class="logo">
+            <h1>📋 Suas Credenciais</h1>
+        </div>
+        
+        <form method="POST" class="form-add">
+            <div class="form-group">
+                <input type="text" name="plataforma" placeholder="Plataforma (ex: Google)" required>
+            </div>
+            <div class="form-group">
+                <input type="text" name="user" placeholder="Nome de usuário/e-mail" required>
+            </div>
+            <div class="form-group">
+                <input type="password" name="senha" placeholder="Senha" required>
+            </div>
+            <button type="submit" class="btn">➕ Adicionar Credencial</button>
         </form>
 
-        <a class="botao" href="{{ url_for('gerar_senha') }}">🔑 Gerar Senha Segura</a>
-        <a class="botao" href="{{ url_for('download_senhas') }}">⬇️ Exportar Senhas</a>
-        <a class="botao" href="{{ url_for('logout') }}">🚪 Sair</a>
+        <div class="action-buttons">
+            <a href="{{ url_for('gerar_senha') }}" class="btn btn-secondary">🔐 Gerar Senha</a>
+            <a href="{{ url_for('download_senhas') }}" class="btn btn-secondary">📤 Exportar</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-secondary">🚪 Sair</a>
+        </div>
 
         {% if senhas %}
+        <div class="table-container">
             <table>
                 <thead>
                     <tr>
                         <th>Plataforma</th>
                         <th>Usuário</th>
-                        <th>Senha</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for plataforma, dados in senhas.items() %}
-                        <tr>
-                            <td>{{ plataforma }}</td>
-                            <td>{{ dados[0] }}</td>
-                            <td id="senha-{{ loop.index }}">{{ dados[1] }}</td>
-                            <td><button type="button" onclick="copiarSenha('senha-{{ loop.index }}')">📋 Copiar</button></td>
-                        </tr>
+                    <tr>
+                        <td>{{ plataforma }}</td>
+                        <td>{{ dados[0] }}</td>
+                        <td>
+                            <button onclick="copiarSenha('{{ plataforma }}')" 
+                                    class="btn-icon" title="Copiar senha">📋</button>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
         {% else %}
-            <p>Nenhuma senha salva ainda.</p>
+        <div class="empty-state">
+            <p>Nenhuma credencial armazenada ainda.</p>
+        </div>
         {% endif %}
     </div>
 
     <script>
-        function copiarSenha(id) {
-            const senha = document.getElementById(id).innerText;
-            navigator.clipboard.writeText(senha)
-                .then(() => alert("Senha copiada!"))
-                .catch(() => alert("Erro ao copiar a senha."));
+        async function copiarSenha(plataforma) {
+            try {
+                const response = await fetch(`/get_password?plataforma=${encodeURIComponent(plataforma)}`);
+                const data = await response.json();
+                await navigator.clipboard.writeText(data.senha);
+                alert('Senha copiada com sucesso!');
+            } catch (error) {
+                alert('Erro ao copiar senha: ' + error.message);
+            }
         }
-
+        
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+        
         function toggleDarkMode() {
-            const html = document.documentElement;
-            const atual = html.getAttribute("data-theme");
-            html.setAttribute("data-theme", atual === "dark" ? "light" : "dark");
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         }
     </script>
 </body>
