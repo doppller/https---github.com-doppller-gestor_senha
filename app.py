@@ -51,16 +51,16 @@ def cadastro():
 def login():
     if request.method == "POST":
         usuario = request.form["usuario"]
-        senha = request.form["senha"].encode()
+        senha = request.form["senha"]
 
-        if usuario in usuarios and checkpw(senha, usuarios[usuario]):
+        if usuario in usuarios and checkpw(senha.encode(), usuarios[usuario]):
             session["usuario"] = usuario
             return redirect(url_for("dashboard"))
-
-        flash("Login inválido! Verifique suas credenciais.", "error")
-        return redirect(url_for("login"))
+        else:
+            flash("Usuário ou senha inválidos")  # Isso aparece no HTML
 
     return render_template("login.html")
+
 
 @app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
@@ -83,15 +83,20 @@ def dashboard():
 
     return render_template("dashboard.html", senhas=senhas_descriptografadas)
 
+@app.route("/gerar_senha")
+def gerar_senha():
+    if "usuario" not in session:
+        return redirect(url_for("login"))
+    return render_template("gerar_senha.html")
+
 @app.route("/download_senhas")
 def download_senhas():
     if "usuario" not in session:
         flash("Você precisa estar logado para baixar suas senhas.", "error")
         return redirect(url_for("login"))
 
-    # Criar um CSV temporário com as senhas criptografadas
     def gerar_csv():
-        yield "Plataforma,Usuário,Senha\n"  # Cabeçalho
+        yield "Plataforma,Usuário,Senha\n"
 
         for plataforma, dados in senhas.items():
             user, senha_criptografada = dados

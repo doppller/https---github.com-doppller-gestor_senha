@@ -2,8 +2,7 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerar Senha Segura</title>
+    <title>Gerar Senha</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,41 +11,92 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
         }
+
         .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
             width: 350px;
-            display: grid;
-            gap: 15px;
             text-align: center;
         }
-        input, button {
-            padding: 10px;
-            border-radius: 5px;
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            margin-bottom: 15px;
+            border-radius: 4px;
             border: 1px solid #ccc;
         }
+
         button {
+            padding: 10px 20px;
+            margin: 5px;
             background-color: #007bff;
-            color: white;
             border: none;
+            color: white;
+            border-radius: 4px;
             cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        #senhaGerada {
+            margin-top: 15px;
+            font-weight: bold;
+            color: green;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Gerar Senha Segura</h2>
+        <h2>Gerador de Senhas</h2>
+        <label for="tamanho">Tamanho:</label>
+        <input type="number" id="tamanho" min="4" max="32" value="12"><br>
+        <button onclick="gerarSenha()">Gerar</button>
+        <button onclick="copiarSenha()">Copiar</button>
 
-        <input type="number" id="tamanho" value="12" min="8" max="32">
-        <button onclick="gerarSenha()">🔒 Gerar Senha</button>
-        <p id="senhaGerada">Clique no botão acima para gerar uma senha.</p>
-        <button onclick="copiarSenha()">📋 Copiar Senha</button>
+        <div id="senhaGerada"></div>
 
-        <a href="{{ url_for('dashboard') }}">⬅ Voltar para o Dashboard</a>
+        <a href="{{ url_for('dashboard') }}">⬅ Voltar ao Dashboard</a>
     </div>
+
+    <script>
+        function gerarSenha() {
+            const tamanho = document.getElementById("tamanho").value;
+            const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*";
+            let senha = "";
+            for (let i = 0; i < tamanho; i++) {
+                senha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            }
+            document.getElementById("senhaGerada").innerText = senha;
+        }
+
+        function copiarSenha() {
+            const senha = document.getElementById("senhaGerada").innerText;
+            if (!senha) return;
+            navigator.clipboard.writeText(senha).then(() => {
+                alert("Senha copiada!");
+            });
+        }
+    </script>
 </body>
 </html>
