@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
     <title>Dashboard - Gestor de Senhas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
 </head>
@@ -18,7 +17,7 @@
         </form>
 
         <a class="botao" href="{{ url_for('gerar_senha') }}">🔑 Gerar Senha Segura</a>
-        <a class="botao" href="{{ url_for('exportar_senhas') }}">⬇️ Exportar Senhas</a>
+        <a class="botao" href="{{ url_for('download_senhas') }}">⬇️ Exportar Senhas</a>
         <a class="botao" href="{{ url_for('logout') }}">🚪 Sair</a>
 
         {% if senhas %}
@@ -44,181 +43,5 @@
             <p>Nenhuma senha salva ainda.</p>
         {% endif %}
     </div>
-=======
-    <title>Meu Cofre de Senhas</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
-            display: grid;
-            grid-template-areas:
-                "titulo"
-                "botoes"
-                "formulario"
-                "tabela";
-            gap: 20px;
-            text-align: center;
-        }
-        h2 {
-            grid-area: titulo;
-            margin: 0;
-        }
-        .botoes {
-            grid-area: botoes;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-        .add-password {
-            grid-area: formulario;
-        }
-        .add-password form {
-            display: grid;
-            gap: 10px;
-        }
-        .add-password form input, .add-password form button {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        .add-password form button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .add-password form button:hover {
-            opacity: 0.8;
-        }
-        table {
-            grid-area: tabela;
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        button:hover {
-            opacity: 0.8;
-        }
-        .danger {
-            background-color: #dc3545;
-        }
-        .download {
-            background-color: #28a745;
-        }
-        .eye-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .eye-btn:hover {
-            color: #007bff;
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <h2>Minhas Senhas</h2>
-
-    <!-- Botões -->
-    <div class="botoes">
-        <a href="{{ url_for('gerar_senha') }}">
-            <button class="generate">🔑 Gerar Nova Senha</button>
-        </a>
-        <a href="{{ url_for('download_senhas') }}">
-            <button class="download">📥 Baixar Minhas Senhas</button>
-        </a>
-        <a href="{{ url_for('logout') }}">
-            <button class="danger">🚪 Sair</button>
-        </a>
-    </div>
-
-    <!-- Formulário para adicionar nova senha -->
-    <div class="add-password">
-        <h3>Adicionar nova senha</h3>
-        <form action="{{ url_for('dashboard') }}" method="POST">
-            <input type="text" name="plataforma" placeholder="Plataforma" required>
-            <input type="text" name="user" placeholder="Usuário" required>
-            <input type="password" name="senha" placeholder="Senha" required>
-            <button type="submit">Adicionar</button>
-        </form>
-    </div>
-
-    <!-- Tabela de Senhas -->
-    <table>
-        <tr>
-            <th>Plataforma</th>
-            <th>Usuário</th>
-            <th>Senha</th>
-            <th>Ações</th>
-        </tr>
-        {% for plataforma, dados in senhas.items() %}
-        <tr>
-            <td>{{ plataforma }}</td>
-            <td>{{ dados[0] }}</td>
-            <td>
-                <span class="senha-mascarada">******</span>
-                <button class="eye-btn" onclick="mostrarSenha(this, '{{ dados[1] }}')">👁️</button>
-            </td>
-            <td>
-                <button class="download" onclick="copiarSenha('{{ dados[1] }}')">📋 Copiar</button>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
-
-<script>
-function mostrarSenha(botao, senha) {
-    let spanSenha = botao.previousElementSibling;
-    if (spanSenha.innerText === "******") {
-        spanSenha.innerText = senha;  
-        botao.innerText = "🔒";  
-    } else {
-        spanSenha.innerText = "******";  
-        botao.innerText = "👁️";  
-    }
-}
-
-function copiarSenha(senha) {
-    navigator.clipboard.writeText(senha);
-    alert("Senha copiada para a área de transferência!");
-}
-</script>
-
->>>>>>> b0f6b9186d920494a72a291d3f9b8ed7a46ce537
 </body>
 </html>
