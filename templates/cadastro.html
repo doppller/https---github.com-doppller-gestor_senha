@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>Cadastro - Gestor de Senhas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
 </head>
@@ -15,6 +16,56 @@
             <button type="submit">Cadastrar</button>
         </form>
         <p>Já tem uma conta? <a href="{{ url_for('login') }}">Faça login</a></p>
+=======
+    <title>Cadastro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            display: grid;
+            gap: 15px;
+            text-align: center;
+        }
+        input, button {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Cadastro</h2>
+
+        <form action="{{ url_for('cadastro') }}" method="POST" style="display: grid; gap: 10px;">
+            <input type="text" name="usuario" placeholder="Usuário" required>
+            <input type="password" name="senha" placeholder="Senha" required>
+            <button type="submit">Criar Conta</button>
+        </form>
+
+        <a href="{{ url_for('login') }}">Já tem conta? Fazer login</a>
+>>>>>>> b0f6b9186d920494a72a291d3f9b8ed7a46ce537
     </div>
 </body>
 </html>
