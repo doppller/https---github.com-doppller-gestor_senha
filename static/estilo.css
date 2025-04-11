@@ -298,6 +298,11 @@ th {
     position: relative;
 }
 
+.password-wrapper input[type="password"],
+.password-wrapper input[type="text"] {
+    padding-right: 40px; /* Espaço para o botão 👁️ */
+}
+
 .toggle-password {
     position: absolute;
     right: 10px;
