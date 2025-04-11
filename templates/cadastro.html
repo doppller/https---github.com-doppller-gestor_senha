@@ -4,35 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - Gestor de Senhas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
 </head>
 <body>
-    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
-    
+    <button id="botao-tema" class="dark-mode-toggle">🌙</button>
+
     <div class="container">
         <div class="logo">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 15V17M6 21H18C19.1046 21 20 20.1046 20 19V13C20 11.8954 19.1046 11 18 11H6C4.89543 11 4 11.8954 4 13V19C4 20.1046 4.89543 21 6 21ZM16 11V7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7V11H16Z" 
-                      stroke="var(--cor-primaria)" stroke-width="2" stroke-linecap="round"/>
-            </svg>
             <h1>Crie sua conta</h1>
         </div>
+
+        <!-- MENSAGENS FLASH -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert alert-{{ messages[0][0] }}">
+                    {{ messages[0][1] }}
+                </div>
+            {% endif %}
+        {% endwith %}
 
         <form method="POST" class="form-cadastro">
             <div class="form-group">
                 <input type="text" name="usuario" placeholder="Escolha um nome de usuário" required>
+                <div id="username-feedback" class="feedback-message"></div>
             </div>
+
             <div class="form-group">
-                <input type="password" name="senha" placeholder="Crie uma senha forte" required>
+                <input type="password" name="senha" id="senha" placeholder="Crie uma senha forte" required>
+
                 <div class="password-strength">
                     <div class="strength-bar"></div>
-                    <span class="strength-text">Força da senha: <span>fraca</span></span>
-                </div>
+                    <span class="strength-text">Força da senha: <span id="strength-level">fraca</span></span>
+                <div>
+
+                <!-- REQUISITOS DE SENHA -->
+                <ul class="password-requirements">
+                    <li>🔒 Pelo menos 8 caracteres</li>
+                    <li>🔡 Uma letra maiúscula</li>
+                    <li>🔢 Um número</li>
+                    <li>✨ Um caractere especial (ex: !, @, #)</li>
+                </ul>
+
             </div>
+
             <div class="form-group">
-                <input type="password" name="confirmar_senha" placeholder="Confirme sua senha" required>
+                <input type="password" name="confirmar_senha" id="confirmar_senha" placeholder="Confirme sua senha" required>
+                <div id="password-match-feedback" class="feedback-message"></div>
             </div>
-            <button type="submit" class="btn">Cadastrar</button>
+
+            <button type="submit" class="btn" id="submit-btn">Cadastrar</button>
         </form>
 
         <div class="form-link">
@@ -41,37 +61,61 @@
     </div>
 
     <script>
-        // Controle do tema
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-        }
+        // Dark Mode
+        document.addEventListener("DOMContentLoaded", function () {
+            const botao = document.getElementById("botao-tema");
+            if (localStorage.getItem("darkMode") === "true") {
+                document.body.classList.add("dark-mode");
+                botao.textContent = "☀️";
+            }
 
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-        }
+            botao.addEventListener("click", () => {
+                document.body.classList.toggle("dark-mode");
+                const modo = document.body.classList.contains("dark-mode") ? "true" : "false";
+                localStorage.setItem("darkMode", modo);
+                botao.textContent = modo === "true" ? "☀️" : "🌙";
+            });
+        });
 
-        // Validação de senha em tempo real
-        const senhaInput = document.querySelector('input[name="senha"]');
+        // Força da senha + validação de confirmação
+        const senhaInput = document.getElementById('senha');
         const strengthBar = document.querySelector('.strength-bar');
-        const strengthText = document.querySelector('.strength-text span');
+        const strengthLevel = document.getElementById('strength-level');
+        const confirmarSenhaInput = document.getElementById('confirmar_senha');
+        const passwordMatchFeedback = document.getElementById('password-match-feedback');
 
         senhaInput.addEventListener('input', function() {
             const strength = checkPasswordStrength(this.value);
             strengthBar.style.width = strength.percent + '%';
             strengthBar.style.backgroundColor = strength.color;
-            strengthText.textContent = strength.text;
-            strengthText.style.color = strength.color;
+            strengthLevel.textContent = strength.text;
+            strengthLevel.style.color = strength.color;
+            validatePasswordMatch();
         });
 
+        confirmarSenhaInput.addEventListener('input', validatePasswordMatch);
+
+        function validatePasswordMatch() {
+            const senha = senhaInput.value;
+            const confirmar = confirmarSenhaInput.value;
+            const submitBtn = document.getElementById('submit-btn');
+
+            if (confirmar && senha !== confirmar) {
+                passwordMatchFeedback.textContent = '✖️ As senhas não coincidem';
+                passwordMatchFeedback.style.color = '#f72585';
+                submitBtn.disabled = true;
+            } else if (confirmar) {
+                passwordMatchFeedback.textContent = '✔️ Senhas coincidem';
+                passwordMatchFeedback.style.color = '#4cc9f0';
+                submitBtn.disabled = false;
+            } else {
+                passwordMatchFeedback.textContent = '';
+                submitBtn.disabled = false;
+            }
+        }
+
         function checkPasswordStrength(password) {
-            const strength = {
-                percent: 0,
-                color: '#ff0000',
-                text: 'fraca'
-            };
-            
-            // Lógica de força da senha (simplificada)
+            const strength = { percent: 0, color: '#ff0000', text: 'fraca' };
             if (password.length > 0) strength.percent = 25;
             if (password.length >= 6) strength.percent = 50;
             if (password.length >= 8 && /[A-Z]/.test(password)) strength.percent = 75;
@@ -86,7 +130,6 @@
                 strength.color = '#f8961e';
                 strength.text = 'média';
             }
-            
             return strength;
         }
     </script>

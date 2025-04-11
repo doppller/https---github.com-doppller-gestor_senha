@@ -4,85 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Gestor de Senhas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
 </head>
 <body>
-    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
-    
+    <!-- Botão de tema -->
+    <button id="botao-tema" class="dark-mode-toggle">🌙</button>
+
     <div class="container">
-        <div class="logo">
-            <h1>📋 Suas Credenciais</h1>
+        <!-- Cabeçalho -->
+        <div class="header">
+            <h1>Bem-vindo, {{ usuario }}!</h1>
+            <a href="{{ url_for('logout') }}" class="btn btn-logout">Sair</a>
         </div>
-        
-        <form method="POST" class="form-add">
-            <div class="form-group">
-                <input type="text" name="plataforma" placeholder="Plataforma (ex: Google)" required>
-            </div>
-            <div class="form-group">
-                <input type="text" name="user" placeholder="Nome de usuário/e-mail" required>
-            </div>
-            <div class="form-group">
-                <input type="password" name="senha" placeholder="Senha" required>
-            </div>
-            <button type="submit" class="btn">➕ Adicionar Credencial</button>
+
+        <!-- Formulário de cadastro de senha -->
+        <form method="POST" class="form-group">
+            <input type="text" name="plataforma" placeholder="Plataforma" required>
+            <input type="text" name="user" placeholder="Usuário" required>
+            <input type="password" name="senha" placeholder="Senha" required>
+            <button type="submit" class="btn">Salvar Senha</button>
         </form>
 
-        <div class="action-buttons">
-            <a href="{{ url_for('gerar_senha') }}" class="btn btn-secondary">🔐 Gerar Senha</a>
-            <a href="{{ url_for('download_senhas') }}" class="btn btn-secondary">📤 Exportar</a>
-            <a href="{{ url_for('logout') }}" class="btn btn-secondary">🚪 Sair</a>
-        </div>
+        <!-- Mensagens flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert alert-{{ messages[0][0] }}">
+                    {{ messages[0][1] }}
+                </div>
+            {% endif %}
+        {% endwith %}
 
+        <!-- Tabela de senhas -->
         {% if senhas %}
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Plataforma</th>
-                        <th>Usuário</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for plataforma, dados in senhas.items() %}
-                    <tr>
-                        <td>{{ plataforma }}</td>
-                        <td>{{ dados[0] }}</td>
-                        <td>
-                            <button onclick="copiarSenha('{{ plataforma }}')" 
-                                    class="btn-icon" title="Copiar senha">📋</button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Plataforma</th>
+                            <th>Usuário</th>
+                            <th>Senha</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for plataforma, dados in senhas.items() %}
+                        <tr>
+                            <td>{{ plataforma }}</td>
+                            <td>{{ dados[0] }}</td>
+                            <td>
+                                <input type="text" id="senha-{{ loop.index }}" value="{{ dados[1] }}" readonly>
+                            </td>
+                            <td>
+                                <button class="btn btn-icon" onclick="copiarSenha('senha-{{ loop.index }}')">📋</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         {% else %}
-        <div class="empty-state">
-            <p>Nenhuma credencial armazenada ainda.</p>
-        </div>
+            <p class="empty-message">Nenhuma senha armazenada ainda.</p>
         {% endif %}
-    </div>
 
+    </div>
+            <!-- Ações -->
+            <div class="action-buttons">
+                <a href="{{ url_for('gerar_senha') }}" class="btn">🔐 Gerar Senha Segura</a>
+                <a href="{{ url_for('download_senhas') }}" class="btn">⬇️ Exportar Senhas</a>
+            </div>
+    
+    <!-- Scripts -->
     <script>
-        async function copiarSenha(plataforma) {
-            try {
-                const response = await fetch(`/get_password?plataforma=${encodeURIComponent(plataforma)}`);
-                const data = await response.json();
-                await navigator.clipboard.writeText(data.senha);
-                alert('Senha copiada com sucesso!');
-            } catch (error) {
-                alert('Erro ao copiar senha: ' + error.message);
+        // Tema escuro persistente
+        document.addEventListener("DOMContentLoaded", function () {
+            const botao = document.getElementById("botao-tema");
+            if (localStorage.getItem("darkMode") === "true") {
+                document.body.classList.add("dark-mode");
+                botao.textContent = "☀️";
             }
-        }
-        
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-        }
-        
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+
+            botao.addEventListener("click", () => {
+                document.body.classList.toggle("dark-mode");
+                const modo = document.body.classList.contains("dark-mode") ? "true" : "false";
+                localStorage.setItem("darkMode", modo);
+                botao.textContent = modo === "true" ? "☀️" : "🌙";
+            });
+        });
+
+        // Copiar senha
+        function copiarSenha(id) {
+            const campo = document.getElementById(id);
+            campo.select();
+            campo.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            alert("Senha copiada!");
         }
     </script>
 </body>
