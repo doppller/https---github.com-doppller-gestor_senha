@@ -425,3 +425,19 @@ input[readonly] {
     background-color: var(--cor-container);
     color: var(--cor-texto);
 }
+
+#tabela-senhas {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#tabela-senhas td, #tabela-senhas th {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+.btn-icon {
+    padding: 5px;
+    min-width: auto;
+}

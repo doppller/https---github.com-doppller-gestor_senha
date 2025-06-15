@@ -17,14 +17,38 @@
             <a href="{{ url_for('logout') }}" class="btn btn-logout">Sair</a>
         </div>
 
-        <!-- Formulário de cadastro de senha -->
-        <form method="POST" class="form-group">
+                <!-- Formulário de cadastro de senha -->
+        <form id="form-adicionar-senha" class="form-group">
             <input type="text" name="plataforma" placeholder="Plataforma" required>
-            <input type="text" name="user" placeholder="Usuário" required>
+            <input type="text" name="username" placeholder="Usuário" required>
             <input type="password" name="senha" placeholder="Senha" required>
             <button type="submit" class="btn">Salvar Senha</button>
         </form>
 
+        <div class-"action-buttons">
+            <a href="{{ url_for('gerar_senha') }}" class="btn">🔐 Gerar Senha Segura</a>
+            <a href="{{ url_for('download_senhas') }}" class="btn">⬇️ Exportar Senhas</a>
+        </div>
+
+        <script>
+            document.getElementById('form-adicionar-senha').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = {
+                    plataforma: e.target.plataforma.value,
+                    username: e.target.username.value,
+                    senha: e.target.senha.value
+                };
+
+                await fetch('/api/senhas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                e.target.reset(); // Limpa o formulário
+                loadPasswords(); // Recarrega a tabela
+            });
+        </script>
         <!-- Mensagens flash -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -35,70 +59,52 @@
         {% endwith %}
 
         <!-- Tabela de senhas -->
-        {% if senhas %}
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Plataforma</th>
-                            <th>Usuário</th>
-                            <th>Senha</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for plataforma, dados in senhas.items() %}
-                        <tr>
-                            <td>{{ plataforma }}</td>
-                            <td>{{ dados[0] }}</td>
-                            <td>
-                                <input type="text" id="senha-{{ loop.index }}" value="{{ dados[1] }}" readonly>
-                            </td>
-                            <td>
-                                <button class="btn btn-icon" onclick="copiarSenha('senha-{{ loop.index }}')">📋</button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <p class="empty-message">Nenhuma senha armazenada ainda.</p>
-        {% endif %}
+<div class="table-container">
+    <table id="tabela-senhas">
+        <thead>
+            <tr>
+                <th>Plataforma</th>
+                <th>Usuário</th>
+                <th>Senha</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dinâmico via JavaScript -->
+        </tbody>
+    </table>
+</div>
 
-    </div>
-            <!-- Ações -->
-            <div class="action-buttons">
-                <a href="{{ url_for('gerar_senha') }}" class="btn">🔐 Gerar Senha Segura</a>
-                <a href="{{ url_for('download_senhas') }}" class="btn">⬇️ Exportar Senhas</a>
-            </div>
-    
-    <!-- Scripts -->
-    <script>
-        // Tema escuro persistente
-        document.addEventListener("DOMContentLoaded", function () {
-            const botao = document.getElementById("botao-tema");
-            if (localStorage.getItem("darkMode") === "true") {
-                document.body.classList.add("dark-mode");
-                botao.textContent = "☀️";
-            }
+<script>
+    // Carregar senhas da API
+    async function loadPasswords() {
+        const response = await fetch('/api/senhas');
+        const senhas = await response.json();
+        const tabela = document.querySelector('#tabela-senhas tbody');
+        tabela.innerHTML = '';
 
-            botao.addEventListener("click", () => {
-                document.body.classList.toggle("dark-mode");
-                const modo = document.body.classList.contains("dark-mode") ? "true" : "false";
-                localStorage.setItem("darkMode", modo);
-                botao.textContent = modo === "true" ? "☀️" : "🌙";
-            });
+        senhas.forEach((senha, index) => {
+            const row = tabela.insertRow();
+            row.innerHTML = `
+                <td>${senha.plataforma}</td>
+                <td>${senha.username}</td>
+                <td><input type="password" value="${senha.senha}" id="senha-${index}" readonly></td>
+                <td>
+                    <button class="btn btn-icon" onclick="copiarSenha('senha-${index}')">📋</button>
+                    <button class="btn btn-icon" onclick="deletePassword(${senha.id})">🗑️</button>
+                </td>
+            `;
         });
+    }
 
-        // Copiar senha
-        function copiarSenha(id) {
-            const campo = document.getElementById(id);
-            campo.select();
-            campo.setSelectionRange(0, 99999);
-            document.execCommand("copy");
-            alert("Senha copiada!");
+    // Deletar senha
+    async function deletePassword(id) {
+        if (confirm('Tem certeza que deseja excluir esta senha?')) {
+            await fetch(`/api/senhas/${id}`, { method: 'DELETE' });
+            loadPasswords(); // Recarrega a tabela
         }
-    </script>
-</body>
-</html>
+    }
+
+    // Carregar dados ao abrir a página
+    document.addEventListener('DOMContentLoaded', loadPasswords);
+</script>

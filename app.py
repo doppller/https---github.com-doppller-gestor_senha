@@ -1,36 +1,63 @@
-
 import os
 import secrets
+import sqlite3
 from flask import Flask, render_template, request, redirect, session, url_for, flash, jsonify, Response
 from bcrypt import hashpw, checkpw, gensalt
 from cryptography.fernet import Fernet
 
 app = Flask(__name__)
 
-# Configurações de segurança melhoradas
+# ==============================================
+# Configurações
+# ==============================================
 app.secret_key = secrets.token_hex(32)
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# Gerenciamento de chave de criptografia
+# Criptografia
 if not os.path.exists('secret_key.key'):
     with open('secret_key.key', 'wb') as key_file:
         key_file.write(Fernet.generate_key())
 
 with open('secret_key.key', 'rb') as key_file:
     chave = key_file.read()
-
 cifra = Fernet(chave)
 
-# Banco de dados temporário
-usuarios = {}
-senhas = {}
+# Banco de Dados
+def get_db():
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row  # Permite acesso aos campos por nome
+    return conn
+
+def init_db():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario TEXT UNIQUE NOT NULL,
+            hash_senha TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS senhas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario_id INTEGER NOT NULL,
+            plataforma TEXT NOT NULL,
+            username TEXT NOT NULL,
+            senha_criptografada TEXT NOT NULL,
+            FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+init_db()  # Executa ao iniciar a aplicação
 
 # ==============================================
-# Rotas Principais
+# Rotas do Front-End (HTML)
 # ==============================================
-
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -45,9 +72,14 @@ def login():
             flash("Preencha todos os campos", "error")
             return redirect(url_for("login"))
 
-        if usuario in usuarios and checkpw(senha.encode(), usuarios[usuario]):
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('SELECT hash_senha FROM usuarios WHERE usuario = ?', (usuario,))
+        resultado = cursor.fetchone()
+        conn.close()
+
+        if resultado and checkpw(senha.encode(), resultado['hash_senha'].encode()):
             session["usuario"] = usuario
-            session.permanent = True
             return redirect(url_for("dashboard"))
         else:
             flash("Usuário ou senha inválidos", "error")
@@ -65,89 +97,164 @@ def cadastro():
             flash("Preencha todos os campos", "error")
             return redirect(url_for("cadastro"))
 
-        if usuario in usuarios:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('SELECT usuario FROM usuarios WHERE usuario = ?', (usuario,))
+        if cursor.fetchone():
             flash("Usuário já existe", "error")
+            conn.close()
             return redirect(url_for("cadastro"))
 
         if senha != confirmar_senha:
             flash("As senhas não coincidem", "error")
+            conn.close()
             return redirect(url_for("cadastro"))
 
         if len(senha) < 8:
             flash("A senha deve ter pelo menos 8 caracteres", "error")
+            conn.close()
             return redirect(url_for("cadastro"))
 
         hash_senha = hashpw(senha.encode(), gensalt())
-        usuarios[usuario] = hash_senha
+        cursor.execute(
+            'INSERT INTO usuarios (usuario, hash_senha) VALUES (?, ?)',
+            (usuario, hash_senha.decode())
+        )
+        conn.commit()
+        conn.close()
         flash("Cadastro realizado! Faça login", "success")
         return redirect(url_for("login"))
 
     return render_template("cadastro.html")
 
-@app.route("/dashboard", methods=["GET", "POST"])
+@app.route("/dashboard")
 def dashboard():
     if "usuario" not in session:
         return redirect(url_for("login"))
 
-    if request.method == "POST":
-        plataforma = request.form["plataforma"]
-        user = request.form["user"]
-        senha = request.form["senha"].encode()
-        senha_criptografada = cifra.encrypt(senha).decode()
-        senhas[plataforma] = (user, senha_criptografada)
-        flash("Senha adicionada com sucesso!", "success")
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT plataforma, username, senha_criptografada 
+        FROM senhas 
+        WHERE usuario_id = (
+            SELECT id FROM usuarios WHERE usuario = ?
+        )
+    ''', (session["usuario"],))
+    senhas_db = cursor.fetchall()
+    conn.close()
 
     senhas_descriptografadas = {
-        plataforma: (dados[0], cifra.decrypt(dados[1].encode()).decode())
-        for plataforma, dados in senhas.items()
+        item['plataforma']: (
+            item['username'], 
+            cifra.decrypt(item['senha_criptografada'].encode()).decode()
+        )
+        for item in senhas_db
     }
-
-    return render_template("dashboard.html", usuario=session["usuario"], senhas=senhas_descriptografadas)
+    return render_template("dashboard.html", 
+        usuario=session["usuario"], 
+        senhas=senhas_descriptografadas
+    )
 
 # ==============================================
-# APIs e Funcionalidades Adicionais
+# API RESTful (Para o Front-End JS)
 # ==============================================
-
-@app.route("/check_username", methods=["POST"])
-def check_username():
-    username = request.json.get("username")
-    if not username:
-        return jsonify({"error": "Nome de usuário não fornecido"}), 400
-    return jsonify({"available": username not in usuarios})
-
-@app.route("/get_password")
-def get_password():
+@app.route("/api/senhas", methods=["GET"])
+def api_get_senhas():
     if "usuario" not in session:
         return jsonify({"error": "Não autorizado"}), 401
 
-    plataforma = request.args.get("plataforma")
-    if not plataforma or plataforma not in senhas:
-        return jsonify({"error": "Plataforma não encontrada"}), 404
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT id, plataforma, username, senha_criptografada 
+        FROM senhas 
+        WHERE usuario_id = (
+            SELECT id FROM usuarios WHERE usuario = ?
+        )
+    ''', (session["usuario"],))
+    senhas_db = cursor.fetchall()
+    conn.close()
 
-    try:
-        senha_decrypt = cifra.decrypt(senhas[plataforma][1].encode()).decode()
-        return jsonify({"senha": senha_decrypt})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    senhas_formatadas = [
+        {
+            "id": item['id'],
+            "plataforma": item['plataforma'],
+            "username": item['username'],
+            "senha": cifra.decrypt(item['senha_criptografada'].encode()).decode()
+        }
+        for item in senhas_db
+    ]
+    return jsonify(senhas_formatadas)
 
-@app.route("/gerar_senha")
-def gerar_senha():
+@app.route("/api/senhas", methods=["POST"])
+def api_add_senha():
     if "usuario" not in session:
-        return redirect(url_for("login"))
-    return render_template("gerar_senha.html")
+        return jsonify({"error": "Não autorizado"}), 401
 
+    data = request.json
+    if not all([data.get("plataforma"), data.get("username"), data.get("senha")]):
+        return jsonify({"error": "Dados incompletos"}), 400
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT id FROM usuarios WHERE usuario = ?', (session["usuario"],))
+    usuario_id = cursor.fetchone()['id']
+
+    senha_criptografada = cifra.encrypt(data["senha"].encode()).decode()
+    cursor.execute(
+        '''INSERT INTO senhas 
+           (usuario_id, plataforma, username, senha_criptografada) 
+           VALUES (?, ?, ?, ?)''',
+        (usuario_id, data["plataforma"], data["username"], senha_criptografada)
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({"success": True}), 201
+
+@app.route("/api/senhas/<int:id>", methods=["DELETE"])
+def api_delete_senha(id):
+    if "usuario" not in session:
+        return jsonify({"error": "Não autorizado"}), 401
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        DELETE FROM senhas 
+        WHERE id = ? AND usuario_id = (
+            SELECT id FROM usuarios WHERE usuario = ?
+        )
+    ''', (id, session["usuario"]))
+    conn.commit()
+    deleted = cursor.rowcount > 0
+    conn.close()
+    return jsonify({"success": deleted}), 200 if deleted else 404
+
+# ==============================================
+# Rotas Adicionais (Download, Logout, etc.)
+# ==============================================
 @app.route("/download_senhas")
 def download_senhas():
     if "usuario" not in session:
-        flash("Você precisa estar logado para baixar suas senhas.", "error")
-        return redirect(url_for("login"))
+        return jsonify({"error": "Não autorizado"}), 401
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT plataforma, username, senha_criptografada 
+        FROM senhas 
+        WHERE usuario_id = (
+            SELECT id FROM usuarios WHERE usuario = ?
+        )
+    ''', (session["usuario"],))
+    senhas_db = cursor.fetchall()
+    conn.close()
 
     def gerar_csv():
         yield "Plataforma,Usuário,Senha\n"
-        for plataforma, dados in senhas.items():
-            user, senha_criptografada = dados
-            senha_real = cifra.decrypt(senha_criptografada.encode()).decode()
-            yield f"{plataforma},{user},{senha_real}\n"
+        for item in senhas_db:
+            senha_real = cifra.decrypt(item['senha_criptografada'].encode()).decode()
+            yield f"{item['plataforma']},{item['username']},{senha_real}\n"
 
     return Response(
         gerar_csv(),
@@ -155,15 +262,13 @@ def download_senhas():
         headers={"Content-Disposition": "attachment; filename=senhas.csv"}
     )
 
-
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect(url_for("home"))
 
 # ==============================================
-# Configurações e Execução
+# Inicialização
 # ==============================================
-
 if __name__ == "__main__":
     app.run(ssl_context='adhoc')

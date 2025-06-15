@@ -23,6 +23,20 @@
             <div class="action-buttons">
                 <button type="button" id="gerarBtn" class="btn">Gerar Senha</button>
                 <button type="button" id="copiarBtn" class="btn btn-secondary">Copiar</button>
+                <button type="button" id="salvarBtn" class="btn">Salvar no Dashboard</button>
+
+                <script>
+                    document.getElementById('salvarBtn').addEventListener('click', async () => {
+                        const senha = document.getElementById('senhaGerada').value;
+                        if (!senha) {
+                            alert('Gere uma senha primeiro!');
+                            return;
+                        }
+
+                        // Redireciona para o dashboard com a senha pré-preenchida
+                        window.location.href = `/dashboard?senha=${encodeURIComponent(senha)}`;
+                    });
+                </script>
             </div>
         </form>
 
@@ -62,7 +76,7 @@
             } else {
                 alert('Gere uma senha primeiro!');
             }
-        });
+        });        
     </script>
 </body>
 </html>
