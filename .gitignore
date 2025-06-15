@@ -1,0 +1,33 @@
+# .gitignore para Gestor de Senhas (Python/Flask/SQLite)
+
+### Banco de Dados e Chaves ###
+database.db       # Arquivo do SQLite (contém dados sensíveis)
+secret_key.key    # Chave de criptografia (Fernet)
+
+### Ambiente Virtual ###
+venv/             # Pasta do virtualenv (Python)
+.env              # Variáveis de ambiente
+*.env             # Qualquer arquivo .env
+
+### Python ###
+__pycache__/      # Cache do Python
+*.pyc             # Bytecode do Python
+*.pyo
+*.pyd
+
+### IDE/Editor ###
+.vscode/          # Configurações do VS Code
+.idea/            # Configurações do PyCharm
+
+### Sistema ###
+.DS_Store         # Arquivo de metadados do macOS
+Thumbs.db         # Arquivo de cache do Windows
+
+### Logs e Temporários ###
+*.log
+*.tmp
+*.temp
+
+### Frontend (opcional) ###
+/node_modules/    # Se usar npm/Node.js (para JS adicional)
+/static/js/bundle.js  # Se usar bundlers (Webpack, etc.)
