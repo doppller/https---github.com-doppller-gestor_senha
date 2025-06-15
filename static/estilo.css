@@ -441,3 +441,9 @@ input[readonly] {
     padding: 5px;
     min-width: auto;
 }
+
+/* Destaca o campo quando pré-preenchido */
+input[name="senha"]:not([value=""]) {
+    border-color: #4cc9f0;
+    box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.3);
+}

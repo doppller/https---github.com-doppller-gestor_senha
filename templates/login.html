@@ -43,16 +43,21 @@
     </div>
 
     <script>
-        // Controle do tema
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-        }
+        // Dark Mode
+        document.addEventListener("DOMContentLoaded", function () {
+            const botao = document.getElementById("botao-tema");
+            if (localStorage.getItem("darkMode") === "true") {
+                document.body.classList.add("dark-mode");
+                botao.textContent = "☀️";
+            }
 
-        // Aplicar tema ao carregar
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-        }
+            botao.addEventListener("click", () => {
+                document.body.classList.toggle("dark-mode");
+                const modo = document.body.classList.contains("dark-mode") ? "true" : "false";
+                localStorage.setItem("darkMode", modo);
+                botao.textContent = modo === "true" ? "☀️" : "🌙";
+            });
+        });
     </script>
 </body>
 </html>

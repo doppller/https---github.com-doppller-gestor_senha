@@ -156,6 +156,12 @@ def dashboard():
         senhas=senhas_descriptografadas
     )
 
+@app.route("/gerar_senha")
+def gerar_senha():
+    if "usuario" not in session:
+        return redirect(url_for("login"))
+    return render_template("gerar_senha.html")
+
 # ==============================================
 # API RESTful (Para o Front-End JS)
 # ==============================================
