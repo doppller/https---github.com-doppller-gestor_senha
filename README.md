@@ -8,7 +8,7 @@ Sistema desenvolvido como projeto acadêmico para gerenciar senhas de forma segu
 ## 🚀 Funcionalidades
 
 - Cadastro e autenticação de usuários (com hash seguro)
-- Armazenamento de senhas criptografadas com chave simétrica
+- Armazenamento seguro com criptografia Fernet
 - Geração de senhas seguras com um clique
 - Exportação das senhas salvas em CSV
 - Interface moderna com CSS Grid e modo escuro
@@ -23,6 +23,7 @@ Sistema desenvolvido como projeto acadêmico para gerenciar senhas de forma segu
 gestor_senhas/
 │
 ├── app.py                      # Backend principal (Flask)
+├──database.db                  # Banco de dados SQLite
 ├── chave.key                   # Chave de criptografia gerada dinamicamente
 │
 ├── templates/                  # Arquivos HTML (frontend)
@@ -35,6 +36,7 @@ gestor_senhas/
 ├── static/
 │   ├── estilo.css              # Estilos globais com suporte a dark mode e CSS Grid
 │   └── tema.js                 # DOM JS para alternância de tema
+└── README.md                   # Documentação
 ```
 
 ---
@@ -78,6 +80,11 @@ pip install flask bcrypt cryptography
 - As senhas salvas (por plataforma) são criptografadas com `Fernet` (chave simétrica).
 - A chave é salva em arquivo `chave.key` e carregada automaticamente.
 
+### ✅ SQLite
+- Facil implementação e visualização das tabelas criadas
+- Suporte nativo no python
+- Não precisa de configuração
+- Arquivo unico (ótimo para aplicações pequenas como essa)
 ---
 
 ## 🌓 Dark Mode
